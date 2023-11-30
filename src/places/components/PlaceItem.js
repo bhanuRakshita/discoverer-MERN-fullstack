@@ -1,16 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import Card from '../../shared/components/UIElements/Card';
-import Button from '../../shared/components/UIElements/Button';
-import Modal from '../../shared/components/UIElements/Modal';
-import './PlaceItem.css';
+import Card from "../../shared/components/UIElements/Card";
+import Button from "../../shared/components/UIElements/Button";
+import Modal from "../../shared/components/UIElements/Modal";
+import Map from "../../shared/components/UIElements/Map";
+import "./PlaceItem.css";
 
-const PlaceItem = props => {
+const PlaceItem = (props) => {
   const [showMap, setShowMap] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const openMapHandler = () => setShowMap(true);
-
   const closeMapHandler = () => setShowMap(false);
+
+  const showDeleteWarningHandler = () => setShowDeleteModal(true);
+  const cancelDeleteHandler = () => setShowDeleteModal(false);
+  const confirmDeletHandler = () => {
+    console.log("deleted!!");
+    setShowDeleteModal(false);
+  }
 
   return (
     <React.Fragment>
@@ -23,9 +31,26 @@ const PlaceItem = props => {
         footer={<Button onClick={closeMapHandler}>CLOSE</Button>}
       >
         <div className="map-container">
-          <h2>THE MAP!</h2>
+          <Map center={props.coordinates} zoom={16} />
         </div>
       </Modal>
+
+      <Modal
+      show={showDeleteModal}
+        header="Delete Place"
+        onCancel={cancelDeleteHandler}
+        contentClass="place-item__modal-content"
+        footerClass="place-item__modal-actions"
+        footer={
+          <>
+          <Button onClick={cancelDeleteHandler}>Cancel</Button>
+          <Button onClick={confirmDeletHandler}>Delete</Button>
+          </>
+        }
+      >
+        <p>Are you sure? Once deleted, it cannot be undone!!!</p>
+      </Modal>
+
       <li className="place-item">
         <Card className="place-item__content">
           <div className="place-item__image">
@@ -37,9 +62,11 @@ const PlaceItem = props => {
             <p>{props.description}</p>
           </div>
           <div className="place-item__actions">
-            <Button inverse onClick={openMapHandler}>VIEW ON MAP</Button>
+            <Button inverse onClick={openMapHandler}>
+              VIEW ON MAP
+            </Button>
             <Button to={`/places/${props.id}`}>EDIT</Button>
-            <Button danger>DELETE</Button>
+            <Button danger onClick={showDeleteWarningHandler}>DELETE</Button>
           </div>
         </Card>
       </li>

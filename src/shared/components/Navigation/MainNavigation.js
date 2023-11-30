@@ -13,13 +13,11 @@ const MainNavigation = (props) => {
 
   return (
     <>
-      
-      
-        <SideDrawer show={drawerIsOpen}>
-          <nav className="main-navigation__drawer-nav">
-            <NavLinks onClick={() => setDrawerIsOpen(false)}/>
-          </nav>
-        </SideDrawer>
+      <SideDrawer show={drawerIsOpen}>
+        <nav className="main-navigation__drawer-nav">
+          <NavLinks onClick={() => setDrawerIsOpen(false)} />
+        </nav>
+      </SideDrawer>
       {drawerIsOpen && <Backdrop onClick={() => setDrawerIsOpen(false)} />}
       <MainHeader>
         <button
@@ -34,7 +32,7 @@ const MainNavigation = (props) => {
           <Link to="/">YourPlaces</Link>
         </h1>
         <nav className="main-navigation__header-nav">
-          <NavLinks onClick={() => setDrawerIsOpen(false)}/>
+          <NavLinks onClick={() => setDrawerIsOpen(false)} />
         </nav>
       </MainHeader>
     </>
