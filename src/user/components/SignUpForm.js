@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 
 import Card from "../../shared/components/UIElements/Card";
 import Button from "../../shared/components/UIElements/Button";
@@ -6,10 +6,15 @@ import Input from "../../shared/components/UIElements/Input";
 
 import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from "../../utils/validators";
 import { useForm } from "../../shared/hooks/form-hook";
+import { AuthContext } from "../../store/AuthContext";
 import "../pages/Auth.css";
+import Auth from "../pages/Auth";
 
 
 const SignUpForm = ({ switchModeHandler }) => {
+
+  const auth = useContext(AuthContext);
+
   const inputValues = {
     name: {
         value: "",
@@ -28,6 +33,7 @@ const SignUpForm = ({ switchModeHandler }) => {
 
   const sighupSubmitHandler = (event) => {
     event.preventDefault();
+    auth.login();
     console.log("Signed Up!");
     console.log(signUpState);
   };

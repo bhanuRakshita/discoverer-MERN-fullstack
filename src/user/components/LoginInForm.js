@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import Input from "../../shared/components/UIElements/Input";
 import Button from "../../shared/components/UIElements/Button";
 import Card from "../../shared/components/UIElements/Card";
@@ -6,8 +6,12 @@ import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH } from "../../utils/validators";
 import "../pages/Auth.css";
 
 import { useForm } from "../../shared/hooks/form-hook";
+import { AuthContext } from "../../store/AuthContext";
 
 const LoginInForm = ({ switchModeHandler }) => {
+
+  const auth = useContext(AuthContext);
+
   const inputValues = {
     email: {
       value: "",
@@ -22,6 +26,7 @@ const LoginInForm = ({ switchModeHandler }) => {
 
   const authSubmitHandler = (event) => {
     event.preventDefault();
+    auth.login();
     console.log("Authenticated!");
     console.log(loginState);
   };
