@@ -1,17 +1,7 @@
-const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
-
-const DUMMY_USERS = [
-  {
-    id: "u1",
-    name: "Bhanu Rakshita Paul",
-    email: "test@123.com",
-    password: "test123",
-  },
-];
 
 const getAllUsers = async (req, res, next) => {
     let users;
@@ -37,7 +27,7 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  const { name, email, password, places } = req.body;
+  const { name, email, password } = req.body;
   let existingUser;
 
   try {
@@ -64,7 +54,7 @@ const signup = async (req, res, next) => {
     password,
     image:
       "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vectorstock.com%2Froyalty-free-vectors%2Fblank-profile-picture-vectors&psig=AOvVaw0RN3FOcWyBOCltPmvO7mb1&ust=1701562612649000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCPC9-eu874IDFQAAAAAdAAAAABAE",
-    places,
+    places: [],
   });
   try {
     await newUser.save();
