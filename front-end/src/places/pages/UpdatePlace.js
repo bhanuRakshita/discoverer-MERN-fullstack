@@ -40,7 +40,7 @@ const UpdatePlace = () => {
         title: formState.inputValues.title.value,
         description: formState.inputValues.description.value,
       });
-      const responseData = await sendRequest(
+      await sendRequest(
         `http://localhost:8080/api/places/${pid}`,
         "PATCH",
         requestBody,

@@ -21,7 +21,7 @@ const Users = () => {
       }
     };
     sendHttpRequest();
-  }, []);
+  }, [sendRequest]);
 
   return (
     <React.Fragment>

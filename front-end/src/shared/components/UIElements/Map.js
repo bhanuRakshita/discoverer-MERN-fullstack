@@ -22,7 +22,7 @@ const Map = (props) => {
       });
 
       // The marker, positioned at Uluru
-      const marker = new AdvancedMarkerElement({
+      new AdvancedMarkerElement({
         map: map,
         position: center,
       });

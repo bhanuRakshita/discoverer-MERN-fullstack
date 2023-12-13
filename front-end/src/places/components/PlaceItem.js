@@ -24,8 +24,9 @@ const PlaceItem = (props) => {
   const cancelDeleteHandler = () => setShowDeleteModal(false);
 
   const confirmDeletHandler = async () => {
+    setShowDeleteModal(false);
     try {
-      const responseData = await sendRequest(
+      await sendRequest(
         `http://localhost:8080/api/places/${props.id}`,
         "DELETE",
         null,
@@ -35,7 +36,6 @@ const PlaceItem = (props) => {
     } catch (err) {
       console.log(err);
     }
-    setShowDeleteModal(false);
   };
 
   return (
