@@ -1,22 +1,26 @@
 const { validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const HttpError = require("../models/http-error");
 const User = require("../models/user");
 
-const getAllUsers = async (req, res, next) => {
-    let users;
-    try{
-        users = await User.find({}, '-password');
-    } catch (err) {
-        const error = new HttpError('Some error occured. Could not find users');
-        return next(error);
-    }
+const JWT_SECRET = process.env.JWT_SECRET;
 
-    if(users.length===0){
-        const error = new HttpError('Could not find any users');
-        return next(error);
-    }
-  res.json({ users: users.map(user=>user.toObject({getters: true})) });
+const getAllUsers = async (req, res, next) => {
+  let users;
+  try {
+    users = await User.find({}, "-password");
+  } catch (err) {
+    const error = new HttpError("Some error occured. Could not find users");
+    return next(error);
+  }
+
+  if (users.length === 0) {
+    const error = new HttpError("Could not find any users");
+    return next(error);
+  }
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
 
 const signup = async (req, res, next) => {
@@ -24,6 +28,7 @@ const signup = async (req, res, next) => {
 
   if (!errors.isEmpty()) {
     const error = new HttpError("Invalid input", 422);
+    console.log(errors);
     return next(error);
   }
 
@@ -48,14 +53,26 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
+  let hashedPwd;
+
+  try {
+    hashedPwd = await bcrypt.hash(password, 12);
+  } catch (err) {
+    const error = new HttpError(
+      "Could not create user, please try again.",
+      500
+    );
+    return next(error);
+  }
+
   const newUser = new User({
     name,
     email,
-    password,
-    image:
-      "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.vectorstock.com%2Froyalty-free-vectors%2Fblank-profile-picture-vectors&psig=AOvVaw0RN3FOcWyBOCltPmvO7mb1&ust=1701562612649000&source=images&cd=vfe&ved=0CBIQjRxqFwoTCPC9-eu874IDFQAAAAAdAAAAABAE",
+    password: hashedPwd,
+    image: req.file.path,
     places: [],
   });
+
   try {
     await newUser.save();
   } catch (err) {
@@ -63,11 +80,30 @@ const signup = async (req, res, next) => {
     return next(error);
   }
 
-  res.status(201).json({ message: "new user added", newUser: newUser });
+  let token;
+  try {
+    token = jwt.sign({ userId: newUser.id, email: newUser.email }, JWT_SECRET, {
+      expiresIn: "1h",
+    });
+  } catch (err) {
+    const error = new HttpError(
+      "Signing up failed, please try again later",
+      422
+    );
+    return next(error);
+  }
+
+  res.status(201).json({
+    userId: newUser.id,
+    email: newUser.email,
+    token: token,
+  });
 };
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
+
+  console.log(req.body.password);
 
   let identifiedUser;
 
@@ -83,11 +119,41 @@ const login = async (req, res, next) => {
 
   if (!identifiedUser) {
     return next(new HttpError("User not found", 401));
-  } else if (identifiedUser.password !== password) {
+  }
+
+  let isValidPassword = false;
+  try {
+    isValidPassword = await bcrypt.compare(password, identifiedUser.password);
+  } catch (err) {
+    const error = new HttpError("Could not log you in, please try again", 500);
+    return next(error);
+  }
+  if (!isValidPassword) {
     return next(new HttpError("incorrect password", 401));
   }
 
-  res.json({ message: "user logged in successfully!!" });
+  let token;
+  try {
+    token = jwt.sign(
+      { userId: identifiedUser.id, email: identifiedUser.email },
+      JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+  } catch (err) {
+    const error = new HttpError(
+      "Logging in failed, please try again later",
+      422
+    );
+    return next(error);
+  }
+
+  res.json({
+    userId: identifiedUser.id,
+    email: identifiedUser.emai,
+    token: token
+  });
 };
 
 exports.getAllUsers = getAllUsers;
